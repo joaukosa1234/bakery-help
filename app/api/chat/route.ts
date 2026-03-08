@@ -12,14 +12,9 @@ export async function POST(req: Request) {
     reply = "1 or 2 not typed";
   }
 
-  return new Response(JSON.stringify({ reply }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
+  return Response.json({
+    version: "1.0",
+    reply: reply
   });
 }
 
