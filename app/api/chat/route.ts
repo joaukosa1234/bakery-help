@@ -54,7 +54,7 @@ Known facts:
 - Email: sales@lexauto.org
 - Address: 5-11220 Voyageur Way, Richmond BC V6X 3E1
 - Hours:
-  Monday-Saturday 10:00 AM-6:30 PM
+  Monday-Saturday 10:00 AM - 6:30 PM
   Sunday Closed
 
 Rules:
@@ -71,7 +71,7 @@ Rules:
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://your-vercel-site.vercel.app",
+        "HTTP-Referer": "https://bakery-nine-jet.vercel.app",
         "X-Title": "Lex Auto Help API",
       },
       body: JSON.stringify({
