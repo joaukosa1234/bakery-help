@@ -1,229 +1,293 @@
-export default function LexAutoFrontendMock() {
-  const navItems = [
-    "Home",
-    "About Us",
-    "Services",
-    "Pricing & Coupons",
-    "Blog",
-    "Gallery",
-    "Testimonials",
-    "FAQ",
-    "Shop",
-    "Contacts",
-  ];
-
-  const faqs = [
+export async function GET() {
+  return new Response(
+    JSON.stringify({
+      status: "Lex Auto Help API running",
+      version: "AI v1.1",
+    }),
     {
-      question:
-        "I HAVE A NEW CAR; DO I NEED TO TAKE IT TO A DEALERSHIP FOR MAINTENANCE IN ORDER TO KEEP MY WARRANTY VALID?",
-      answer:
-        "No. As long as you follow the manufacturer's maintenance schedule in your owner's manual, your warranty remains valid. Independent shops can perform this work as long as the service is done properly and documented.",
-    },
-    {
-      question: "WHAT DO I HAVE TO DO TO KEEP MY CAR OR TRUCK'S WARRANTY IN EFFECT?",
-      answer:
-        "Service your vehicle at the intervals listed in the owner's manual and keep clear maintenance records, including the date, mileage, VIN, and parts installed on the invoice.",
-      highlight: true,
-    },
-    {
-      question: "MY CAR IS A LEASED VEHICLE. AM I RESPONSIBLE FOR MAINTENANCE?",
-      answer:
-        "Yes. Even if you lease a vehicle, you are still responsible for the maintenance and repairs required to keep it in good working order according to the owner's manual.",
-    },
-    {
-      question:
-        "WHAT PARTS SHOULD BE REPLACED AND AT WHAT INTERVALS SHOULD THESE SERVICES BE PERFORMED?",
-      answer:
-        "Check your owner's manual for the exact service intervals and any severe-service notes. Following the manufacturer's schedule is the best way to protect both the vehicle and the warranty.",
-    },
-    {
-      question:
-        "WHAT IF MY NEW CAR NEEDS REPAIRS OTHER THAN REGULARLY SCHEDULED MAINTENANCE SUCH AS A BRAKE JOB OR OTHER REPAIRS? DO I HAVE TO RETURN TO THE DEALER FOR THESE REPAIRS? WHAT IF THESE REPAIRS ARE COVERED UNDER MY WARRANTY?",
-      answer:
-        "You can choose where to have most repairs done, but repairs covered under the manufacturer's warranty may still need to be handled by the dealer. Review the warranty booklet carefully for the exact rules.",
-    },
-    {
-      question: "DOES BRAKE FLUID REALLY NEED TO BE CHANGED?",
-      answer:
-        "Yes. Brake fluid absorbs moisture over time, which can lead to internal corrosion and reduced braking performance. Periodic brake fluid service helps protect the hydraulic system.",
-    },
-    {
-      question: "HOW OFTEN SHOULD ANTIFREEZE BE REPLACED?",
-      answer:
-        "Coolant replacement intervals vary by vehicle, but fresh coolant is important for corrosion protection, water pump lubrication, and temperature control. Always follow the owner's manual.",
-    },
-  ];
-
-  return (
-    <div className="min-h-screen bg-[#ececec] text-black">
-      <TopStrip />
-      <Header />
-
-      <nav className="mx-auto flex w-full max-w-[1500px] items-center bg-[#efefef] px-6 py-0 shadow-sm">
-        {navItems.map((item) => (
-          <button
-            key={item}
-            className={`border-r border-transparent px-5 py-7 text-[19px] font-medium transition hover:bg-[#f8f8f8] ${
-              item === "FAQ" ? "bg-[#f1d400]" : ""
-            }`}
-          >
-            {item}
-          </button>
-        ))}
-        <div className="ml-auto text-4xl text-[#444]">⌕</div>
-      </nav>
-
-      <Hero />
-
-      <main className="mx-auto max-w-[1500px] px-6 pb-16 pt-12">
-        <div className="space-y-8">
-          {faqs.map((faq, index) => (
-            <FaqCard key={index} {...faq} />
-          ))}
-        </div>
-      </main>
-
-      <Footer />
-
-      <button className="fixed bottom-6 right-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#f1d400] text-4xl shadow-2xl transition hover:scale-105">
-        🚗
-      </button>
-    </div>
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    }
   );
 }
 
-function TopStrip() {
-  return (
-    <div className="bg-[#0f0f0f] text-white">
-      <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-3 text-[15px] md:text-[18px]">
-        <div className="font-light tracking-wide">
-          Monday-Saturday <span className="text-[#f1d400]">10:00AM - 6:30PM</span>
-        </div>
-        <button className="rounded-bl-[38px] rounded-tl-none rounded-tr-none bg-[#f1d400] px-10 py-4 text-[17px] font-semibold text-black md:text-[20px]">
-          ➜ APPOINTMENT
-        </button>
-      </div>
-    </div>
-  );
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const message = String(body.message ?? "").trim();
+
+    if (!message) {
+      return jsonResponse(400, {
+        version: "AI v1.1",
+        reply: "Please send a message. (H)",
+      });
+    }
+
+    const normalizedMessage = normalizeText(message);
+
+    const hardcodedReply = getHardcodedReply(normalizedMessage);
+    if (hardcodedReply) {
+      return jsonResponse(200, {
+        version: "AI v1.1",
+        reply: `${hardcodedReply} (H)`,
+      });
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY;
+
+    if (!apiKey) {
+      return jsonResponse(500, {
+        version: "AI v1.1",
+        reply:
+          "I’m having trouble answering right now. Please contact Lex Auto Solutions directly at 604-303-9020 or sales@lexauto.org. (H)",
+      });
+    }
+
+    const systemPrompt = `
+You are Lex Auto Assistant for Lex Auto Solutions.
+
+Known facts:
+- Phone: 604-303-9020
+- Email: sales@lexauto.org
+- Address: 5-11220 Voyageur Way, Richmond BC V6X 3E1
+- Hours:
+  Monday-Saturday 10:00 AM-6:30 PM
+  Sunday Closed
+
+Rules:
+- Answer briefly, clearly, and helpfully.
+- If the user asks about hours, location, phone, email, contact, appointments, or general shop questions, use the known facts above.
+- If you are unsure, say so and direct them to contact the shop.
+- Do not invent pricing, repair estimates, inventory, warranty coverage, or services not confirmed.
+- Do not use markdown bold formatting.
+- End every response with (A).
+`.trim();
+
+    const aiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://your-vercel-site.vercel.app",
+        "X-Title": "Lex Auto Help API",
+      },
+      body: JSON.stringify({
+        model: "openrouter/free",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: message },
+        ],
+        max_tokens: 220,
+        temperature: 0.4,
+      }),
+    });
+
+    const rawText = await aiRes.text();
+    console.log("OpenRouter status:", aiRes.status);
+    console.log("OpenRouter raw response:", rawText);
+
+    let data: any = null;
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      return jsonResponse(502, {
+        version: "AI v1.1",
+        reply:
+          "I’m having trouble answering right now. Please contact Lex Auto Solutions directly at 604-303-9020 or sales@lexauto.org. (H)",
+      });
+    }
+
+    if (!aiRes.ok) {
+      console.error("OpenRouter error parsed:", data);
+      return jsonResponse(502, {
+        version: "AI v1.1",
+        reply:
+          "I’m having trouble answering right now. Please contact Lex Auto Solutions directly at 604-303-9020 or sales@lexauto.org. (H)",
+      });
+    }
+
+    let reply =
+      String(data?.choices?.[0]?.message?.content ?? "").trim() ||
+      String(data?.choices?.[0]?.text ?? "").trim() ||
+      "";
+
+    if (!reply) {
+      return jsonResponse(502, {
+        version: "AI v1.1",
+        reply:
+          "I’m having trouble answering right now. Please contact Lex Auto Solutions directly at 604-303-9020 or sales@lexauto.org. (H)",
+      });
+    }
+
+    if (!reply.endsWith("(A)")) {
+      reply = `${reply} (A)`;
+    }
+
+    return jsonResponse(200, {
+      version: "AI v1.1",
+      reply,
+    });
+  } catch (error) {
+    console.error("Chat route error:", error);
+
+    return jsonResponse(500, {
+      version: "AI v1.1",
+      reply:
+        "I’m having trouble answering right now. Please contact Lex Auto Solutions directly at 604-303-9020 or sales@lexauto.org. (H)",
+    });
+  }
 }
 
-function Header() {
-  return (
-    <header className="bg-gradient-to-r from-[#0e0e0e] via-[#1a1a1a] to-[#2d2d2d] text-white">
-      <div className="mx-auto flex max-w-[1500px] flex-col gap-5 px-6 py-7 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="text-[56px] font-black uppercase leading-none tracking-tight text-[#f1d400] md:text-[64px]">
-            Lex Auto
-          </div>
-          <div className="-mt-1 text-[22px] uppercase tracking-[0.22em] text-white/90">
-            Solutions
-          </div>
-        </div>
-
-        <div className="text-right">
-          <div className="text-[18px] uppercase tracking-wide text-white/90 md:text-[22px]">
-            Schedule your appointment today
-          </div>
-          <div className="mt-1 text-[40px] font-light tracking-wide md:text-[58px]">
-            604-303-9020
-          </div>
-        </div>
-      </div>
-    </header>
-  );
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders(),
+  });
 }
 
-function Hero() {
-  return (
-    <section className="relative overflow-hidden bg-[#1a1a1a]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.07),transparent_55%)]" />
-      <div className="mx-auto max-w-[1500px] px-6 py-16 md:py-24">
-        <div className="mb-6 text-[16px] text-white/90 md:text-[18px]">Home / Frequently Asked Question</div>
-        <h1 className="text-[46px] font-light leading-none text-white md:text-[80px]">
-          Frequently <span className="font-medium text-[#f1d400]">Asked Question</span>
-        </h1>
-        <p className="mt-5 max-w-[1100px] text-[17px] leading-8 text-white/75 md:text-[22px]">
-          At Lex Auto Solutions we want to make servicing as simple, and hassle free as possible. Below are some frequently asked questions. If your question isn't listed below, please do not hesitate to contact our Customer Service team on 604-303-9020.
-        </p>
-      </div>
-    </section>
-  );
+function jsonResponse(
+  status: number,
+  body: { version: string; reply?: string; status?: string }
+) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: corsHeaders(),
+  });
 }
 
-type FaqCardProps = {
-  question: string;
-  answer: string;
-  highlight?: boolean;
-};
-
-function FaqCard({ question, answer, highlight }: FaqCardProps) {
-  return (
-    <section className="border-t border-[#e0cb2b] bg-[#ececec]">
-      <div className="flex flex-col gap-6 py-9 md:flex-row md:gap-10">
-        <div className="flex h-[118px] w-[118px] shrink-0 items-center justify-center bg-[#f1d400] text-[56px] font-light leading-none text-black">
-          −
-        </div>
-
-        <div className="max-w-[1260px] pt-1">
-          <h2
-            className={`max-w-[1200px] text-[26px] font-medium uppercase leading-tight md:text-[30px] ${
-              highlight ? "text-[#e2bf00]" : "text-black"
-            }`}
-          >
-            {question}
-          </h2>
-          <p className="mt-8 max-w-[1300px] text-[18px] leading-[1.75] text-[#222] md:text-[24px]">
-            {answer}
-          </p>
-        </div>
-      </div>
-    </section>
-  );
+function corsHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
 }
 
-function Footer() {
-  return (
-    <footer className="mt-10 bg-[#212121] text-white">
-      <div className="mx-auto max-w-[1500px] px-6 py-20">
-        <div className="text-[28px] md:text-[48px]">
-          Call: <span className="font-semibold text-[#f1d400]">604-303-9020</span>
-        </div>
+function normalizeText(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-        <div className="mt-12 grid gap-8 text-[18px] md:text-[28px]">
-          <div className="flex items-start gap-5">
-            <div className="text-[#f1d400]">📍</div>
-            <div>5-11220 Voyageur Way, Richmond BC V6X 3E1</div>
-          </div>
-          <div className="flex items-start gap-5">
-            <div className="text-[#f1d400]">🕘</div>
-            <div>
-              <div>
-                Monday-Saturday <span className="text-[#f1d400]">10:00AM - 6:30PM</span>
-              </div>
-              <div>Sunday Closed</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-5">
-            <div className="text-[#f1d400]">✉️</div>
-            <div>sales@lexauto.org</div>
-          </div>
-        </div>
+function hasAny(text: string, keywords: string[]) {
+  return keywords.some((keyword) => text.includes(keyword));
+}
 
-        <div className="mt-12 flex flex-wrap gap-4">
-          {["f", "t", "g+", "▶", "◎", "t", "Be", "in"].map((icon) => (
-            <div
-              key={icon}
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-[#f1d400] text-[24px] font-semibold text-black"
-            >
-              {icon}
-            </div>
-          ))}
-        </div>
-      </div>
+function getHardcodedReply(message: string): string | null {
+  const asksHours =
+    hasAny(message, [
+      "hours",
+      "hour",
+      "open",
+      "close",
+      "closing",
+      "opening",
+      "time",
+      "times",
+      "shop hours",
+      "today",
+    ]) && !hasAny(message, ["phone", "number"]);
 
-      <div className="bg-black px-6 py-7 text-center text-[16px] text-white/90 md:text-[18px]">
-        © 2021 Lex Auto Solutions, All Rights Reserved
-      </div>
-    </footer>
-  );
+  if (asksHours) {
+    return "Lex Auto Solutions is open Monday to Saturday from 10:00 AM to 6:30 PM. The shop is closed on Sunday.";
+  }
+
+  const asksPhone = hasAny(message, [
+    "phone",
+    "number",
+    "call",
+    "contact number",
+    "telephone",
+    "tel",
+  ]);
+
+  if (asksPhone) {
+    return "You can call Lex Auto Solutions at 604-303-9020.";
+  }
+
+  const asksEmail = hasAny(message, [
+    "email",
+    "mail",
+    "e mail",
+    "gmail",
+    "contact email",
+  ]);
+
+  if (asksEmail) {
+    return "You can email Lex Auto Solutions at sales@lexauto.org.";
+  }
+
+  const asksLocation = hasAny(message, [
+    "where",
+    "location",
+    "located",
+    "address",
+    "where are you",
+    "where is the shop",
+    "richmond",
+  ]);
+
+  if (asksLocation) {
+    return "Lex Auto Solutions is located at 5-11220 Voyageur Way, Richmond BC V6X 3E1.";
+  }
+
+  const asksAppointment = hasAny(message, [
+    "appointment",
+    "book",
+    "booking",
+    "schedule",
+    "scheduled",
+    "reserve",
+  ]);
+
+  if (asksAppointment) {
+    return "To schedule an appointment, please call Lex Auto Solutions at 604-303-9020.";
+  }
+
+  const asksWarranty = hasAny(message, [
+    "warranty",
+    "dealer warranty",
+    "keep my warranty",
+    "manufacturer warranty",
+  ]);
+
+  if (asksWarranty) {
+    return "You generally do not need to return to the dealership for regular maintenance to keep your warranty valid, as long as the work follows the manufacturer’s schedule and is properly documented.";
+  }
+
+  const asksBrakeFluid = hasAny(message, [
+    "brake fluid",
+    "fluid flush",
+    "brake flush",
+  ]);
+
+  if (asksBrakeFluid) {
+    return "Brake fluid should be changed periodically because it absorbs moisture over time, which can lead to corrosion and reduced brake system performance.";
+  }
+
+  const asksCoolant = hasAny(message, [
+    "antifreeze",
+    "coolant",
+    "radiator fluid",
+  ]);
+
+  if (asksCoolant) {
+    return "Coolant replacement intervals depend on the vehicle, so check your owner's manual or contact Lex Auto Solutions for guidance.";
+  }
+
+  const asksGeneralContact =
+    hasAny(message, ["contact", "reach you", "reach us", "how do i contact"]) &&
+    !hasAny(message, ["phone", "email"]);
+
+  if (asksGeneralContact) {
+    return "You can contact Lex Auto Solutions by phone at 604-303-9020 or by email at sales@lexauto.org.";
+  }
+
+  return null;
 }
