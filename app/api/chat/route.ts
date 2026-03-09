@@ -1,3 +1,19 @@
+export async function GET() {
+  return new Response(
+    JSON.stringify({
+      status: "Bakery Help API running",
+      version: "AI v1.0",
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    }
+  );
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -6,7 +22,7 @@ export async function POST(req: Request) {
     if (!message) {
       return new Response(
         JSON.stringify({
-          version: "1.1",
+          version: "AI v1.0",
           reply: "Please send a message.",
         }),
         {
@@ -26,7 +42,7 @@ export async function POST(req: Request) {
     if (!apiKey) {
       return new Response(
         JSON.stringify({
-          version: "1.1",
+          version: "AI v1.0",
           reply: "Missing OPENROUTER_API_KEY.",
         }),
         {
@@ -83,7 +99,7 @@ Do not invent pricing, inventory, or policies.
 
       return new Response(
         JSON.stringify({
-          version: "1.1",
+          version: "AI v1.0",
           reply: "AI service error. Please try again.",
         }),
         {
@@ -105,7 +121,7 @@ Do not invent pricing, inventory, or policies.
 
     return new Response(
       JSON.stringify({
-        version: "1.1",
+        version: "AI v1.0",
         reply,
       }),
       {
@@ -123,7 +139,7 @@ Do not invent pricing, inventory, or policies.
 
     return new Response(
       JSON.stringify({
-        version: "1.1",
+        version: "AI v1.0",
         reply: "Server error.",
       }),
       {
