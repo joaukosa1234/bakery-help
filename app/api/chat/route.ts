@@ -6,24 +6,56 @@ export async function GET() {
     }),
     {
       status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: corsHeaders(),
     }
   );
 }
 
-export async function POST() {
-  return new Response(
-    JSON.stringify({
-      version: "AI v1.1",
-      reply: "I’m ready to help. (H)",
-    }),
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+export async function POST(req: Request) {
+  try {
+    const body = await req.json().catch(() => ({}));
+    const message = String(body.message ?? "").trim();
+
+    return new Response(
+      JSON.stringify({
+        version: "AI v1.1",
+        reply: message
+          ? "I’m ready to help. (H)"
+          : "Please send a message. (H)",
+      }),
+      {
+        status: 200,
+        headers: corsHeaders(),
+      }
+    );
+  } catch (error) {
+    console.error("POST /api/chat error:", error);
+
+    return new Response(
+      JSON.stringify({
+        version: "AI v1.1",
+        reply: "Backend crashed. (H)",
+      }),
+      {
+        status: 500,
+        headers: corsHeaders(),
+      }
+    );
+  }
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: corsHeaders(),
+  });
+}
+
+function corsHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
 }
