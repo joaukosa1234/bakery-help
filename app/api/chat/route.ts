@@ -65,7 +65,7 @@ export async function OPTIONS() {
   });
 }
 
-const VERSION = "AI v1.2";
+const VERSION = "AI v1.3";
 
 const SHOP = {
   name: "Lex Auto Solutions",
@@ -75,375 +75,6 @@ const SHOP = {
   hours: "Monday to Saturday from 10:00 AM to 6:30 PM. Closed Sunday.",
   diagnosticPrice: "$120",
 };
-
-type Intent = {
-  name: string;
-  reply: string;
-  phrases: string[];
-  tokens: string[];
-  minScore?: number;
-};
-
-const INTENTS: Intent[] = [
-  {
-    name: "hours",
-    reply: `${SHOP.name} is open ${SHOP.hours}`,
-    phrases: [
-      "what are your hours",
-      "when are you open",
-      "what time are you open",
-      "what time do you close",
-      "are you open today",
-      "shop hours",
-      "business hours",
-      "when do you open",
-      "when do you close",
-      "open sunday",
-      "closed sunday",
-    ],
-    tokens: [
-      "hours",
-      "hour",
-      "open",
-      "close",
-      "closing",
-      "opening",
-      "time",
-      "times",
-      "today",
-      "sunday",
-      "monday",
-      "saturday",
-    ],
-    minScore: 2,
-  },
-  {
-    name: "location",
-    reply: `${SHOP.name} is located at ${SHOP.address}.`,
-    phrases: [
-      "where are you located",
-      "what is your address",
-      "where is the shop",
-      "where are you",
-      "shop address",
-      "location",
-      "directions",
-      "richmond address",
-    ],
-    tokens: [
-      "where",
-      "location",
-      "located",
-      "address",
-      "directions",
-      "richmond",
-      "voyageur",
-    ],
-    minScore: 2,
-  },
-  {
-    name: "phone",
-    reply: `You can call ${SHOP.name} at ${SHOP.phone}.`,
-    phrases: [
-      "what is your phone number",
-      "what is your number",
-      "can i call you",
-      "contact number",
-      "telephone number",
-      "phone number",
-    ],
-    tokens: ["phone", "number", "call", "telephone", "tel"],
-    minScore: 1,
-  },
-  {
-    name: "email",
-    reply: `You can email ${SHOP.name} at ${SHOP.email}.`,
-    phrases: [
-      "what is your email",
-      "can i email you",
-      "contact email",
-      "email address",
-    ],
-    tokens: ["email", "mail", "gmail", "e-mail"],
-    minScore: 1,
-  },
-  {
-    name: "diagnostic",
-    reply: `A diagnostic inspection at ${SHOP.name} is ${SHOP.diagnosticPrice}.`,
-    phrases: [
-      "how much is a diagnostic",
-      "diagnostic price",
-      "diagnostic cost",
-      "what does a diagnostic cost",
-      "check engine light diagnostic",
-      "scan price",
-      "engine diagnostic price",
-    ],
-    tokens: [
-      "diagnostic",
-      "diagnostics",
-      "diagnose",
-      "diagnosis",
-      "scan",
-      "scanning",
-      "troubleshoot",
-      "troubleshooting",
-      "check",
-      "engine",
-      "light",
-      "cel",
-    ],
-    minScore: 2,
-  },
-  {
-    name: "appointment",
-    reply: `You can schedule an appointment online or by calling ${SHOP.phone}. Please note the website says requested date and time may need confirmation.`,
-    phrases: [
-      "book an appointment",
-      "schedule an appointment",
-      "how do i book",
-      "can i book online",
-      "make an appointment",
-      "schedule service",
-      "appointment",
-    ],
-    tokens: [
-      "appointment",
-      "book",
-      "booking",
-      "schedule",
-      "scheduled",
-      "reserve",
-      "quote",
-    ],
-    minScore: 1,
-  },
-  {
-    name: "after-hours-dropoff",
-    reply: `${SHOP.name} offers after-hours drop-off, and the website says you can drop off your vehicle 24/7.`,
-    phrases: [
-      "after hours drop off",
-      "after-hours dropoff",
-      "can i drop off after hours",
-      "drop off my car after hours",
-      "24 7 drop off",
-      "dropoff",
-    ],
-    tokens: ["after", "hours", "drop", "dropoff", "drop-off", "24", "7"],
-    minScore: 2,
-  },
-  {
-    name: "warranty",
-    reply:
-      "Lex Auto Solutions lists a 12-month / 24,000 km nationwide warranty. For manufacturer warranty questions, regular maintenance generally does not need to be done at the dealer as long as it follows the manufacturer schedule and is properly documented.",
-    phrases: [
-      "do your repairs have a warranty",
-      "how long is your warranty",
-      "what is your warranty",
-      "keep my warranty valid",
-      "manufacturer warranty",
-      "dealer warranty",
-    ],
-    tokens: [
-      "warranty",
-      "warranties",
-      "dealer",
-      "manufacturer",
-      "nationwide",
-      "valid",
-    ],
-    minScore: 1,
-  },
-  {
-    name: "loaner",
-    reply: `${SHOP.name} lists courtesy loaner vehicles on the website.`,
-    phrases: [
-      "do you have loaner cars",
-      "do you offer a loaner",
-      "can i get a loaner vehicle",
-      "courtesy loaner",
-    ],
-    tokens: ["loaner", "loaners", "car", "vehicle", "courtesy"],
-    minScore: 2,
-  },
-  {
-    name: "shuttle",
-    reply: `${SHOP.name} lists a courtesy local shuttle service on the website.`,
-    phrases: [
-      "do you have shuttle service",
-      "do you offer a shuttle",
-      "courtesy shuttle",
-      "local shuttle",
-    ],
-    tokens: ["shuttle", "courtesy", "local", "ride"],
-    minScore: 1,
-  },
-  {
-    name: "roadside",
-    reply: `${SHOP.name} lists 24-hour roadside assistance on the website.`,
-    phrases: [
-      "do you offer roadside assistance",
-      "roadside assistance",
-      "24 hour roadside assistance",
-    ],
-    tokens: ["roadside", "assistance", "24", "hour"],
-    minScore: 2,
-  },
-  {
-    name: "services-general",
-    reply:
-      `${SHOP.name} offers general auto repair and maintenance, manufacturer recommended service, preventative maintenance, transmission repair and replacement, brake repair and replacement, A/C repair, tire repair and replacement, fuel system repair, exhaust repair, engine cooling system maintenance, electrical diagnostics, starting and charging repair, wheel alignment, CV axles, computer diagnostic testing, oil changes, tune-ups, brake service, and steering and suspension work.`,
-    phrases: [
-      "what services do you offer",
-      "what do you do",
-      "services",
-      "do you service cars",
-      "what can you repair",
-    ],
-    tokens: ["services", "service", "repair", "repairs", "offer", "do"],
-    minScore: 2,
-  },
-  {
-    name: "brakes",
-    reply:
-      `${SHOP.name} offers brake repair and replacement, brake jobs, brake service, and brake inspections. Brake fluid should also be changed periodically because it absorbs moisture over time.`,
-    phrases: [
-      "do you do brakes",
-      "brake job",
-      "brake service",
-      "brake repair",
-      "brake inspection",
-      "brake fluid",
-      "brake flush",
-    ],
-    tokens: ["brake", "brakes", "fluid", "flush", "inspection"],
-    minScore: 1,
-  },
-  {
-    name: "transmission",
-    reply: `${SHOP.name} offers transmission repair and replacement and lists transmission services on the website.`,
-    phrases: [
-      "do you fix transmissions",
-      "transmission repair",
-      "transmission replacement",
-      "transmission service",
-    ],
-    tokens: ["transmission", "gearbox"],
-    minScore: 1,
-  },
-  {
-    name: "ac",
-    reply: `${SHOP.name} offers air conditioning A/C repair.`,
-    phrases: [
-      "do you repair ac",
-      "ac repair",
-      "air conditioning repair",
-      "fix my ac",
-    ],
-    tokens: ["ac", "a/c", "air", "conditioning"],
-    minScore: 2,
-  },
-  {
-    name: "tires",
-    reply: `${SHOP.name} offers tire repair and replacement, and the website also includes tire pricing tools.`,
-    phrases: [
-      "do you do tires",
-      "tire repair",
-      "tire replacement",
-      "tire pricing",
-      "new tires",
-    ],
-    tokens: ["tire", "tires", "wheel"],
-    minScore: 1,
-  },
-  {
-    name: "alignment",
-    reply: `${SHOP.name} offers wheel alignment services.`,
-    phrases: [
-      "do you do wheel alignment",
-      "alignment service",
-      "wheel alignment",
-    ],
-    tokens: ["alignment", "align", "wheel"],
-    minScore: 1,
-  },
-  {
-    name: "oil-change",
-    reply: `${SHOP.name} offers oil changes and manufacturer recommended maintenance services.`,
-    phrases: [
-      "do you do oil changes",
-      "oil change",
-      "engine oil service",
-    ],
-    tokens: ["oil", "change", "service"],
-    minScore: 2,
-  },
-  {
-    name: "coolant",
-    reply:
-      `${SHOP.name} offers engine cooling system maintenance and engine cooling system flush and repair. Coolant replacement interval depends on the vehicle, so the owner's manual or a shop inspection is the best guide.`,
-    phrases: [
-      "do you do coolant service",
-      "antifreeze replacement",
-      "coolant flush",
-      "radiator fluid",
-      "cooling system repair",
-    ],
-    tokens: [
-      "coolant",
-      "antifreeze",
-      "radiator",
-      "cooling",
-      "flush",
-      "overheat",
-    ],
-    minScore: 1,
-  },
-  {
-    name: "electrical",
-    reply: `${SHOP.name} offers electrical diagnostics plus starting and charging repair.`,
-    phrases: [
-      "electrical diagnostics",
-      "starting and charging repair",
-      "battery charging issue",
-      "alternator issue",
-    ],
-    tokens: [
-      "electrical",
-      "starting",
-      "charging",
-      "battery",
-      "alternator",
-      "starter",
-      "diagnostic",
-    ],
-    minScore: 2,
-  },
-  {
-    name: "inspection",
-    reply: `${SHOP.name} lists computer diagnostic testing, brake inspections, and state emissions inspection / emission repair facility services on the website.`,
-    phrases: [
-      "do you do inspections",
-      "emissions inspection",
-      "inspection service",
-      "brake inspection",
-    ],
-    tokens: ["inspection", "inspect", "emission", "emissions"],
-    minScore: 1,
-  },
-  {
-    name: "contact",
-    reply: `You can contact ${SHOP.name} by phone at ${SHOP.phone}, by email at ${SHOP.email}, or visit the shop at ${SHOP.address}.`,
-    phrases: [
-      "how do i contact you",
-      "how can i reach you",
-      "contact info",
-      "contact information",
-    ],
-    tokens: ["contact", "reach", "info", "information"],
-    minScore: 1,
-  },
-];
 
 async function getAiReply(message: string): Promise<string | null> {
   const apiKey = process.env.OPENROUTER_API_KEY;
@@ -465,11 +96,32 @@ async function getAiReply(message: string): Promise<string | null> {
       body: JSON.stringify({
         model: "openrouter/auto",
         temperature: 0.3,
-        max_tokens: 220,
+        max_tokens: 180,
         messages: [
           {
             role: "system",
-            content: buildSystemPrompt(),
+            content: `
+You are Lex Auto Assistant for Lex Auto Solutions.
+
+Known business facts:
+- Address: ${SHOP.address}
+- Phone: ${SHOP.phone}
+- Email: ${SHOP.email}
+- Hours: ${SHOP.hours}
+- Diagnostic inspection price: ${SHOP.diagnosticPrice}
+- After-hours drop-off is available 24/7.
+- The website lists a 12-month / 24,000 km nationwide warranty.
+- The website lists 24-hour roadside assistance, courtesy local shuttle service, and courtesy loaner vehicle.
+- Services listed include preventative maintenance, brake repair and replacement, transmission repair and replacement, A/C repair, tire repair and replacement, fuel system repair, exhaust repair, engine cooling system maintenance, electrical diagnostics, starting and charging repair, wheel alignment, computer diagnostics, oil changes, tune-ups, and steering/suspension work.
+
+Rules:
+- Be short and direct.
+- Prefer answers like "Yes, we do that."
+- Do not invent prices except diagnostic inspection price.
+- Do not invent exact availability or turnaround times.
+- If unsure, direct the customer to call ${SHOP.phone} or email ${SHOP.email}.
+- Do not use markdown bold.
+            `.trim(),
           },
           {
             role: "user",
@@ -486,213 +138,392 @@ async function getAiReply(message: string): Promise<string | null> {
       return null;
     }
 
-    let data: any = null;
-    try {
-      data = JSON.parse(rawText);
-    } catch (parseError) {
-      console.error("OpenRouter parse error:", parseError, rawText);
-      return null;
-    }
-
+    const data = JSON.parse(rawText);
     const reply =
       String(data?.choices?.[0]?.message?.content ?? "").trim() ||
       String(data?.choices?.[0]?.text ?? "").trim() ||
       "";
 
-    if (!reply) {
-      return null;
-    }
+    if (!reply) return null;
 
-    return sanitizeAiReply(reply);
+    return reply.replace(/\s+\((A|H)\)\s*$/i, "").trim();
   } catch (error) {
     console.error("OpenRouter request error:", error);
     return null;
   }
 }
 
-function buildSystemPrompt() {
-  return `
-You are Lex Auto Assistant for Lex Auto Solutions.
+function getHardcodedReply(message: string): string | null {
+  // hours
+  if (matches(message, [
+    "what are your hours",
+    "when are you open",
+    "when r u open",
+    "wen are you open",
+    "what time do you open",
+    "what time do you close",
+    "are you open today",
+    "are you open sunday",
+    "shop hours",
+    "business hours",
+  ], [
+    "hours", "hour", "open", "close", "today", "sunday", "time", "times"
+  ])) {
+    return `${SHOP.name} is open ${SHOP.hours}`;
+  }
 
-Business facts:
-- Name: ${SHOP.name}
-- Address: ${SHOP.address}
-- Phone: ${SHOP.phone}
-- Email: ${SHOP.email}
-- Hours: ${SHOP.hours}
-- Diagnostic inspection price: ${SHOP.diagnosticPrice}
-- Appointments can be scheduled online or by phone.
-- The website says requested appointment date and time may need confirmation.
-- The website says after-hours drop-off is available 24/7.
+  // location
+  if (matches(message, [
+    "where are you located",
+    "where are you",
+    "what is your address",
+    "shop address",
+    "where is the shop",
+    "richmond address",
+    "adress",
+  ], [
+    "where", "location", "located", "address", "richmond", "voyageur"
+  ])) {
+    return `${SHOP.name} is located at ${SHOP.address}.`;
+  }
 
-Services listed on the website:
-- General auto repair and maintenance
-- Preventative maintenance
-- Manufacturer recommended service
-- Transmission repair and replacement
-- Brake repair and replacement
-- Brake service and brake inspections
-- Air conditioning A/C repair
-- Tire repair and replacement
-- Fuel system repair
-- Exhaust system repair
-- Engine cooling system maintenance
-- Engine cooling system flush and repair
-- Electrical diagnostics
-- Starting and charging repair
-- Wheel alignment
-- CV axles
-- Computer diagnostic testing
-- Oil change
-- Tune up
-- Steering and suspension work
-- Emissions inspection and emission repair facility
+  // phone
+  if (matches(message, [
+    "what is your phone number",
+    "what is your number",
+    "can i call you",
+    "contact number",
+    "telephone number",
+  ], [
+    "phone", "number", "call", "telephone", "tel"
+  ])) {
+    return `You can call ${SHOP.name} at ${SHOP.phone}.`;
+  }
 
-Benefits listed on the website:
-- 12-month / 24,000 km nationwide warranty
-- 24-hour roadside assistance
-- Courtesy local shuttle service
-- Courtesy loaner vehicle
-- ASE certified technicians
-- RepairPal fair-price estimate positioning
+  // email
+  if (matches(message, [
+    "what is your email",
+    "can i email you",
+    "contact email",
+    "email address",
+  ], [
+    "email", "mail", "e mail"
+  ])) {
+    return `You can email ${SHOP.name} at ${SHOP.email}.`;
+  }
 
-Rules:
-- Be concise, helpful, and sound like a service advisor.
-- Use the business facts above when the user asks about the shop.
-- Do not invent prices except diagnostic inspection price, which is ${SHOP.diagnosticPrice}.
-- Do not invent exact turnaround times, part availability, or appointment availability.
-- If you are unsure, say so and direct the user to call ${SHOP.phone} or email ${SHOP.email}.
-- Do not use markdown bold.
-- Do not mention being an AI.
-`.trim();
+  // appointment
+  if (matches(message, [
+    "book an appointment",
+    "schedule an appointment",
+    "can i book online",
+    "how do i book",
+    "make an appointment",
+    "schedule service",
+  ], [
+    "appointment", "book", "booking", "schedule", "reserve"
+  ])) {
+    return `You can schedule an appointment online or by calling ${SHOP.phone}.`;
+  }
+
+  // diagnostic price
+  if (matches(message, [
+    "how much is a diagnostic",
+    "diagnostic cost",
+    "diagnostic price",
+    "check engine diagnostic price",
+    "how much is diagnosis",
+    "diagnotic",
+    "diagnositc",
+  ], [
+    "diagnostic", "diagnostics", "diagnosis", "scan", "check engine", "cel"
+  ])) {
+    return `A diagnostic inspection at ${SHOP.name} is ${SHOP.diagnosticPrice}.`;
+  }
+
+  // cooling / coolant
+  if (matches(message, [
+    "do you do coolant fixes",
+    "do you fix coolant leaks",
+    "coolant leak",
+    "coolent leak",
+    "cooling system repair",
+    "radiator repair",
+    "overheating problem",
+    "antifreeze issue",
+    "water pump problem",
+    "thermostat issue",
+  ], [
+    "coolant", "coolent", "cooling", "radiator", "overheat", "overheating",
+    "antifreeze", "water pump", "thermostat"
+  ])) {
+    return "Yes, we do cooling system repairs including coolant leaks, radiator issues, overheating problems, and related cooling system service.";
+  }
+
+  // brakes
+  if (matches(message, [
+    "do you do brakes",
+    "brake job",
+    "brake repair",
+    "brake service",
+    "brake inspection",
+    "brake fluid flush",
+    "brake flush",
+  ], [
+    "brake", "brakes", "pads", "rotors", "caliper", "brake fluid", "flush"
+  ])) {
+    return "Yes, we do brake repair, brake service, brake inspections, and brake fluid service.";
+  }
+
+  // oil changes
+  if (matches(message, [
+    "do you do oil changes",
+    "oil change",
+    "engine oil service",
+  ], [
+    "oil", "change", "oil change"
+  ])) {
+    return "Yes, we do oil changes and manufacturer recommended maintenance.";
+  }
+
+  // transmission
+  if (matches(message, [
+    "do you fix transmissions",
+    "transmission repair",
+    "transmission replacement",
+    "transmission service",
+    "gearbox repair",
+  ], [
+    "transmission", "gearbox"
+  ])) {
+    return "Yes, we do transmission repair and replacement.";
+  }
+
+  // air conditioning
+  if (matches(message, [
+    "do you repair ac",
+    "ac repair",
+    "air conditioning repair",
+    "fix my ac",
+    "a c repair",
+    "a/c repair",
+  ], [
+    "ac", "a/c", "air conditioning", "conditioning"
+  ])) {
+    return "Yes, we do air conditioning repair.";
+  }
+
+  // tires
+  if (matches(message, [
+    "do you do tires",
+    "tire repair",
+    "tire replacement",
+    "new tires",
+    "flat tire repair",
+  ], [
+    "tire", "tires"
+  ])) {
+    return "Yes, we do tire repair and tire replacement.";
+  }
+
+  // alignment
+  if (matches(message, [
+    "do you do alignment",
+    "wheel alignment",
+    "alignment service",
+    "car alignment",
+  ], [
+    "alignment", "align", "wheel"
+  ])) {
+    return "Yes, we do wheel alignment service.";
+  }
+
+  // batteries / charging
+  if (matches(message, [
+    "do you do batteries",
+    "battery replacement",
+    "battery issue",
+    "alternator issue",
+    "starter issue",
+    "charging problem",
+  ], [
+    "battery", "batteries", "alternator", "starter", "charging"
+  ])) {
+    return "Yes, we do battery-related diagnostics plus starting and charging system repair.";
+  }
+
+  // suspension / steering
+  if (matches(message, [
+    "do you do suspension",
+    "steering repair",
+    "suspension repair",
+    "front end issue",
+  ], [
+    "steering", "suspension", "front end"
+  ])) {
+    return "Yes, we do steering and suspension work.";
+  }
+
+  // exhaust
+  if (matches(message, [
+    "do you fix exhaust",
+    "exhaust repair",
+    "muffler repair",
+  ], [
+    "exhaust", "muffler"
+  ])) {
+    return "Yes, we do exhaust system repair.";
+  }
+
+  // fuel system
+  if (matches(message, [
+    "do you fix fuel system",
+    "fuel system repair",
+    "fuel cleaning",
+    "injector cleaning",
+  ], [
+    "fuel", "injector", "cleaning"
+  ])) {
+    return "Yes, we do fuel system repair and fuel system cleaning services.";
+  }
+
+  // warranty
+  if (matches(message, [
+    "do your repairs have a warranty",
+    "how long is your warranty",
+    "what is your warranty",
+    "repair warranty",
+  ], [
+    "warranty", "nationwide"
+  ])) {
+    return "We offer a 12-month / 24,000 km nationwide warranty on qualifying repairs and services.";
+  }
+
+  // roadside
+  if (matches(message, [
+    "do you offer roadside assistance",
+    "roadside assistance",
+    "24 hour roadside assistance",
+  ], [
+    "roadside", "assistance"
+  ])) {
+    return "Yes, we offer 24-hour roadside assistance.";
+  }
+
+  // shuttle
+  if (matches(message, [
+    "do you have shuttle service",
+    "shuttle service",
+    "courtesy shuttle",
+  ], [
+    "shuttle", "courtesy shuttle"
+  ])) {
+    return "Yes, we offer a courtesy local shuttle service.";
+  }
+
+  // loaner
+  if (matches(message, [
+    "do you have loaner cars",
+    "loaner car",
+    "courtesy loaner",
+    "loaner vehicle",
+  ], [
+    "loaner", "courtesy loaner"
+  ])) {
+    return "Yes, we offer a courtesy loaner vehicle.";
+  }
+
+  // after-hours dropoff
+  if (matches(message, [
+    "can i drop off after hours",
+    "after hours drop off",
+    "after-hours drop off",
+    "24 7 drop off",
+    "drop off my car tonight",
+  ], [
+    "after hours", "drop off", "dropoff", "24/7"
+  ])) {
+    return "Yes, we offer after-hours drop-off, and the website says you can drop off your vehicle 24/7.";
+  }
+
+  // inspections / emissions
+  if (matches(message, [
+    "do you do inspections",
+    "emissions inspection",
+    "brake inspection",
+    "inspection service",
+  ], [
+    "inspection", "inspect", "emissions", "emission"
+  ])) {
+    return "Yes, we do inspections, including brake inspections, and the website also lists emissions inspection and emission repair services.";
+  }
+
+  // general contact
+  if (matches(message, [
+    "how do i contact you",
+    "how can i reach you",
+    "contact info",
+    "contact information",
+  ], [
+    "contact", "reach", "info", "information"
+  ])) {
+    return `You can contact ${SHOP.name} by phone at ${SHOP.phone}, by email at ${SHOP.email}, or visit us at ${SHOP.address}.`;
+  }
+
+  // broad services question
+  if (matches(message, [
+    "what services do you offer",
+    "what do you do",
+    "what can you fix",
+    "what do you repair",
+  ], [
+    "services", "service", "repair", "repairs", "offer"
+  ])) {
+    return "We do general auto repair and maintenance, brakes, transmission work, A/C repair, tire service, fuel system repair, exhaust work, cooling system service, electrical diagnostics, starting and charging repair, wheel alignment, oil changes, tune-ups, and steering and suspension work.";
+  }
+
+  return null;
 }
 
-function sanitizeAiReply(reply: string) {
-  return reply
-    .replace(/\s+\(A\)\s*$/i, "")
-    .replace(/\s+\(H\)\s*$/i, "")
-    .trim();
+function matches(message: string, phrases: string[], keywords: string[]) {
+  for (const phrase of phrases) {
+    if (message.includes(normalizeText(phrase))) return true;
+    if (fuzzyPhraseMatch(message, phrase) >= 0.82) return true;
+  }
+
+  let hits = 0;
+  for (const keyword of keywords) {
+    if (hasKeyword(message, keyword)) hits += 1;
+  }
+
+  return hits >= 1;
 }
 
-function jsonResponse(
-  status: number,
-  body: { version: string; reply?: string; status?: string }
-) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: corsHeaders(),
-  });
-}
+function hasKeyword(message: string, keyword: string) {
+  const tokens = tokenize(message);
+  const targetTokens = tokenize(keyword);
 
-function corsHeaders() {
-  return {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
+  return targetTokens.every((target) =>
+    tokens.some((token) => similarity(token, target) >= fuzzyThreshold(target))
+  );
 }
 
 function normalizeText(text: string) {
   return text
     .toLowerCase()
-    .replace(/[$]/g, " dollars ")
     .replace(/[^\w\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 function tokenize(text: string) {
-  return normalizeText(text)
-    .split(" ")
-    .filter(Boolean);
-}
-
-function hasAny(text: string, keywords: string[]) {
-  return keywords.some((keyword) => text.includes(keyword));
-}
-
-function getHardcodedReply(message: string): string | null {
-  const bestIntent = findBestIntent(message);
-  return bestIntent?.reply ?? null;
-}
-
-function findBestIntent(message: string): Intent | null {
-  let best: { intent: Intent; score: number } | null = null;
-
-  for (const intent of INTENTS) {
-    const score = scoreIntent(message, intent);
-
-    if (score >= (intent.minScore ?? 2)) {
-      if (!best || score > best.score) {
-        best = { intent, score };
-      }
-    }
-  }
-
-  return best?.intent ?? null;
-}
-
-function scoreIntent(message: string, intent: Intent) {
-  let score = 0;
-
-  for (const phrase of intent.phrases) {
-    if (message.includes(normalizeText(phrase))) {
-      score += 6;
-    } else {
-      const phraseScore = fuzzyPhraseMatch(message, phrase);
-      if (phraseScore >= 0.86) score += 5;
-      else if (phraseScore >= 0.74) score += 3;
-    }
-  }
-
-  const messageTokens = tokenize(message);
-
-  for (const token of intent.tokens) {
-    if (messageTokens.includes(token)) {
-      score += 2;
-      continue;
-    }
-
-    const fuzzyToken = messageTokens.some(
-      (word) => similarity(word, token) >= fuzzyThreshold(token)
-    );
-
-    if (fuzzyToken) {
-      score += 1;
-    }
-  }
-
-  if (
-    intent.name === "hours" &&
-    hasConcept(messageTokens, ["open", "close", "hours", "time"])
-  ) {
-    score += 2;
-  }
-
-  if (
-    intent.name === "location" &&
-    hasConcept(messageTokens, ["where", "address", "located", "location"])
-  ) {
-    score += 2;
-  }
-
-  if (
-    intent.name === "diagnostic" &&
-    hasConcept(messageTokens, ["diagnostic", "diagnosis", "scan", "check"]) &&
-    hasConcept(messageTokens, ["price", "cost", "much", "how"])
-  ) {
-    score += 3;
-  }
-
-  return score;
+  return normalizeText(text).split(" ").filter(Boolean);
 }
 
 function fuzzyPhraseMatch(message: string, phrase: string) {
   const msgTokens = tokenize(message);
   const phraseTokens = tokenize(phrase);
-
-  if (msgTokens.length === 0 || phraseTokens.length === 0) return 0;
+  if (!msgTokens.length || !phraseTokens.length) return 0;
 
   let matched = 0;
   for (const phraseToken of phraseTokens) {
@@ -703,15 +534,6 @@ function fuzzyPhraseMatch(message: string, phrase: string) {
   }
 
   return matched / phraseTokens.length;
-}
-
-function hasConcept(messageTokens: string[], targets: string[]) {
-  return targets.some((target) =>
-    messageTokens.some(
-      (token) =>
-        token === target || similarity(token, target) >= fuzzyThreshold(target)
-    )
-  );
 }
 
 function fuzzyThreshold(word: string) {
@@ -731,7 +553,6 @@ function similarity(a: string, b: string) {
 function levenshtein(a: string, b: string) {
   const m = a.length;
   const n = b.length;
-
   const dp: number[][] = Array.from({ length: m + 1 }, () =>
     Array(n + 1).fill(0)
   );
@@ -751,4 +572,23 @@ function levenshtein(a: string, b: string) {
   }
 
   return dp[m][n];
+}
+
+function jsonResponse(
+  status: number,
+  body: { version: string; reply?: string; status?: string }
+) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: corsHeaders(),
+  });
+}
+
+function corsHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
 }
