@@ -459,7 +459,7 @@ async function getAiReply(message: string): Promise<string | null> {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://bakery-help.vercel.app",
+        "HTTP-Referer": "https://lexauto-chat.vercel.app",
         "X-Title": "Lex Auto Help API",
       },
       body: JSON.stringify({
